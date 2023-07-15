@@ -1,0 +1,18 @@
+!function $my_code($fgcolor, $bgcolor)
+!return "<color:"+$fgcolor+"><back:"+$bgcolor+"><size:14><b><font:monospaced>"
+!endfunction
+
+!function $my_code($fgcolor)
+!return "<color:"+$fgcolor+"><size:14><b><font:monospaced>"
+!endfunction
+
+!function $my_code()
+!return "<color:black><size:14><b><font:monospaced>"
+!endfunction
+
+!function $my_class()
+!return "<color:#ADD1B2><size:14><b><font:monospaced>"
+!endfunction
+!function $my_type()
+!return "<color:DarkBlue><size:14><b><font:monospaced>"
+!endfunction
