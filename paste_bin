@@ -1,18 +1,48 @@
-!function $my_code($fgcolor, $bgcolor)
-!return "<color:"+$fgcolor+"><back:"+$bgcolor+"><size:14><b><font:monospaced>"
-!endfunction
+/******************************************************************************
 
-!function $my_code($fgcolor)
-!return "<color:"+$fgcolor+"><size:14><b><font:monospaced>"
-!endfunction
+Welcome to GDB Online.
+GDB online is an online compiler and debugger tool for C, C++, Python, Java, PHP, Ruby, Perl,
+C#, OCaml, VB, Swift, Pascal, Fortran, Haskell, Objective-C, Assembly, HTML, CSS, JS, SQLite, Prolog.
+Code, Compile, Run and Debug online from anywhere in world.
 
-!function $my_code()
-!return "<color:black><size:14><b><font:monospaced>"
-!endfunction
+*******************************************************************************/
+#include <iostream>
+#include <iomanip>
+#include <locale>
 
-!function $my_class()
-!return "<color:#ADD1B2><size:14><b><font:monospaced>"
-!endfunction
-!function $my_type()
-!return "<color:DarkBlue><size:14><b><font:monospaced>"
-!endfunction
+using namespace std;
+const int SIZE = 31;
+
+void printBase(const string& text) {
+    int space = ((SIZE - text.length()))/2;
+    std::cout << " "
+        << std::right
+        << std::setfill(' ')<< std::setw(space) << text << " \n" 
+        << std::right
+        << std::setfill(' ')<< std::setw(space)<< " \n";
+}
+void printChain(const string& name, bool val=true) {
+    int space = ((SIZE - name.length()))/2;
+    std::cout <<" " << std::setfill('-')<< std::setw(SIZE) << "\n";
+    std::cout << "|"
+        << std::right
+        << std::setfill('*')<< std::setw(space) << " "<< name << " " 
+        << std::right
+        << std::setfill('*')<< std::setw(space)<< "|";
+        if (!val){
+            std::cout << "  ->  END\n";
+        }else {
+            std::cout << "\n";
+        }
+    std::cout <<" " << std::setfill('-')<< std::setw(SIZE) << "\n";
+    if (val){
+        printBase("↓");
+    }
+}
+int main()
+{
+    cout<<"Hello World\n";
+    printChain("RoutineFilter");
+    printChain("ImageTypeCESMRecombineFilter", false);
+    return 0;
+}
