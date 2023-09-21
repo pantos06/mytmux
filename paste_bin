@@ -1,33 +1,17 @@
-#include <iostream>
-#include <chrono>
-#include <sstream>
+[{
+  "adsBoitier" : "6620DB01633180",
+  "idConfiguration" : "25327203000274",
+  "idPRM" : "50061322004103",
 
-// Function to convert string date to chrono::time_point
-std::chrono::system_clock::time_point stringToDate(const std::string& dateString) {
-    std::tm tm = {}; // Initialize all fields to 0
-    std::istringstream dateStream(dateString);
+  "dateEvenement" : "2023-08-23T10:20:25.012+02:00"
+},
+{
+  "adsBoitier" : "9999999"
+  "idConfiguration" : "25327203000274",
+  "idPRM" : "50061322004103",
 
-    dateStream >> std::get_time(&tm, "%Y-%m-%d %H:%M:%S");
-
-    if (dateStream.fail()) {
-        throw std::runtime_error("Failed to parse the date string.");
-    }
-
-    // Convert the std::tm to std::time_t (seconds since epoch)
-    std::time_t time = std::mktime(&tm);
-
-    // Create the chrono::time_point from std::time_t
-    return std::chrono::system_clock::from_time_t(time);
+  "dateEvenement" : "2023-08-23T10:20:25.012+02:00"
 }
 
-int main() {
-    std::string dateString = "2023-07-20 15:30:45";
-    try {
-        std::chrono::system_clock::time_point timePoint = stringToDate(dateString);
-        std::cout << "Time point: " << std::chrono::system_clock::to_time_t(timePoint) << std::endl;
-    } catch (const std::exception& e) {
-        std::cerr << "Error: " << e.what() << std::endl;
-    }
-
-    return 0;
-}
+ 
+]
