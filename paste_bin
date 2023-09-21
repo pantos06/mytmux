@@ -1,17 +1,67 @@
-[{
-  "adsBoitier" : "6620DB01633180",
-  "idConfiguration" : "25327203000274",
-  "idPRM" : "50061322004103",
+#!/bin/bash
 
-  "dateEvenement" : "2023-08-23T10:20:25.012+02:00"
-},
-{
-  "adsBoitier" : "9999999"
-  "idConfiguration" : "25327203000274",
-  "idPRM" : "50061322004103",
+# Define your SQLite database file path
+DB_FILE="your_database.db"
 
-  "dateEvenement" : "2023-08-23T10:20:25.012+02:00"
-}
+# Path to your JSON file
+JSON_FILE="data.json"
 
- 
-]
+# Loop through the JSON array elements
+jq -c '.[]' "$JSON_FILE" | while read -r json; do
+    # Extract values from the JSON using jq
+    adsBoitier=$(echo "$json" | jq -r '.adsBoitier')
+    idConfiguration=$(echo "$json" | jq -r '.idConfiguration')
+    idPRM=$(echo "$json" | jq -r '.idPRM')
+    dateEvenement=$(echo "$json" | jq -r '.dateEvenement')
+
+    # Insert data into the SQLite database
+    sqlite3 "$DB_FILE" <<EOF
+    INSERT INTO your_table (adsBoitier, idConfiguration, idPRM, dateEvenement)
+    VALUES ('$adsBoitier', '$idConfiguration', '$idPRM', '$dateEvenement');
+EOF
+
+    # Check for errors and handle them if necessary
+    if [ $? -ne 0 ]; then
+        echo "Error inserting data into the database."
+        exit 1
+    fi
+done
+
+echo "Data insertion completed."
+
+
+########################################
+#!/bin/bash
+
+# Define your database connection information
+DB_HOST="localhost"
+DB_USER="your_db_user"
+DB_PASS="your_db_password"
+DB_NAME="your_db_name"
+
+# Path to your JSON file
+JSON_FILE="data.json"
+
+# Loop through the JSON array elements
+jq -c '.[]' "$JSON_FILE" | while read -r json; do
+    # Extract values from the JSON using jq
+    adsBoitier=$(echo "$json" | jq -r '.adsBoitier')
+    idConfiguration=$(echo "$json" | jq -r '.idConfiguration')
+    idPRM=$(echo "$json" | jq -r '.idPRM')
+    dateEvenement=$(echo "$json" | jq -r '.dateEvenement')
+
+    # Insert data into the database using the appropriate SQL command
+    sql="INSERT INTO your_table (adsBoitier, idConfiguration, idPRM, dateEvenement) VALUES ('$adsBoitier', '$idConfiguration', '$idPRM', '$dateEvenement');"
+
+    # Use the appropriate database command-line tool to execute the SQL
+    # Replace 'mysql' with the command-line tool for your specific database
+    mysql -h "$DB_HOST" -u "$DB_USER" -p"$DB_PASS" "$DB_NAME" -e "$sql"
+
+    # Check for errors and handle them if necessary
+    if [ $? -ne 0 ]; then
+        echo "Error inserting data into the database."
+        exit 1
+    fi
+done
+
+echo "Data insertion completed."
