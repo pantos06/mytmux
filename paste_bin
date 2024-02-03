@@ -1,1 +1,46 @@
-Je tiens à présenter mes excuses pour tout inconvénient que cela pourrait occasionner. Mes priorités ont évolué ces derniers temps, et actuellement, je suis en mesure d'effectuer mon travail efficacement en télétravail. J'ai mûrement réfléchi à cette décision et je suis convaincu(e) que c'est la meilleure option compte tenu de ma situation. J'ai subi une pression considérable de la part de mon ESN au cours des trois derniers mois pour un retour sur site, mais je suis persuadé(e) que le télétravail représente la solution la plus adaptée pour la poursuite de ma carrière.
+import * as fs from 'fs';
+import * as rd from 'readline'
+
+type ProcessFunction = (line: string) => string;
+interface IInfo {
+    start: string;
+    end: string;
+} 
+const generateType = (src: string, dest:string, process: ProcessFunction, info: IInfo) => {
+    var reader = rd.createInterface(fs.createReadStream(src))
+    var result = info.start;
+    reader.on("line", (l: string) => {
+        result += process(l);
+    })
+
+    reader.on("close", ()=> {
+        result += info.end;
+        console.log(result);
+        fs.writeFileSync(dest, result)
+    })
+};
+
+const processAnnotation=(line: string) => {
+    var tokens = line.split(',');
+    var id= tokens[0].trim();
+    var dicomTagName = tokens[1].trim();
+    return `export const ${id}:Annotation = {dicomName: '${dicomTagName}'};\n`;
+}
+
+var info: IInfo = {
+    start: "import {Annotation } from './annotation-type'; \n\n",
+    end: ''
+}
+generateType("./annotation.csv",'./generated-annotation.ts', processAnnotation as ProcessFunction, info);
+
+
+info = {
+    start: "export const AvailableAnnotations = [\n",
+    end: '];'
+}
+const processAnnotationGroup=(line: string) => {
+
+    return `\t[${line}],\n`;
+}
+
+generateType("./annotation-group.csv",'./generated-annotation-group.ts', processAnnotationGroup as ProcessFunction, info);
