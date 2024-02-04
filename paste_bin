@@ -5,18 +5,30 @@ type ProcessFunction = (line: string) => string;
 interface IInfo {
     start: string;
     end: string;
-} 
-const generateType = (src: string, dest:string, process: ProcessFunction, info: IInfo) => {
-    var reader = rd.createInterface(fs.createReadStream(src))
-    var result = info.start;
+};
+interface IParameter {
+    src: string;
+    dest: string;
+    process: ProcessFunction;
+    info: IInfo;
+    append?: boolean;
+};
+
+const generateType = (param: IParameter) => {
+    var reader = rd.createInterface(fs.createReadStream(param.src))
+    var result = param.info.start;
     reader.on("line", (l: string) => {
-        result += process(l);
+        result += param.process(l);
     })
 
     reader.on("close", ()=> {
-        result += info.end;
+        result += param.info.end;
         console.log(result);
-        fs.writeFileSync(dest, result)
+        if (param.append) {
+            fs.appendFileSync(param.dest, result);
+        } else {
+            fs.writeFileSync(param.dest, result);
+        }
     })
 };
 
@@ -24,63 +36,35 @@ const processAnnotation=(line: string) => {
     var tokens = line.split(',');
     var id= tokens[0].trim();
     var dicomTagName = tokens[1].trim();
-    return `export const ${id}:Annotation = {dicomName: '${dicomTagName}'};\n`;
+    return `export const ${id}: Annotation = { dicomTagName: '${dicomTagName}' };\n`;
 }
 
-var info: IInfo = {
-    start: "import {Annotation } from './annotation-type'; \n\n",
-    end: ''
-}
-generateType("./annotation.csv",'./generated-annotation.ts', processAnnotation as ProcessFunction, info);
+var param: IParameter = {
+    src: './annotation.csv',
+    dest: './generated-annotation.ts',
+    process: processAnnotation,
+    info: {
+        start: "import {Annotation } from './annotation-type'; \n\n",
+        end: ''
+    }  
+};
+
+generateType(param);
 
 
-info = {
-    start: "export const AvailableAnnotations = [\n",
-    end: '];'
-}
 const processAnnotationGroup=(line: string) => {
 
     return `\t[${line}],\n`;
 }
-
-generateType("./annotation-group.csv",'./generated-annotation-group.ts', processAnnotationGroup as ProcessFunction, info);
-
-
-
-#############################################
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-var fs = require("fs");
-var rd = require("readline");
-var generateType = function (src, dest, process, info) {
-    var reader = rd.createInterface(fs.createReadStream(src));
-    var result = info.start;
-    reader.on("line", function (l) {
-        result += process(l);
-    });
-    reader.on("close", function () {
-        result += info.end;
-        console.log(result);
-        fs.writeFileSync(dest, result);
-    });
+param = {
+    src: './annotation-group.csv',
+    dest: './generated-annotation.ts',
+    process: processAnnotationGroup,
+    info: {
+        start: "\n\nexport const AvailableAnnotations = [\n",
+        end: '];'
+    },
+    append: true
 };
-var processAnnotation = function (line) {
-    var tokens = line.split(',');
-    var id = tokens[0].trim();
-    var dicomTagName = tokens[1].trim();
-    return "export const ".concat(id, ":Annotation = {dicomName: '").concat(dicomTagName, "'};\n");
-};
-var info = {
-    start: "import {Annotation } from './annotation-type'; \n\n",
-    end: ''
-};
-generateType("./annotation.csv", './generated-annotation.ts', processAnnotation, info);
-info = {
-    start: "export const AvailableAnnotations = [\n",
-    end: '];'
-};
-var processAnnotationGroup = function (line) {
-    return "\t[".concat(line, "],\n");
-};
-generateType("./annotation-group.csv", './generated-annotation-group.ts', processAnnotationGroup, info);
 
+generateType(param);
